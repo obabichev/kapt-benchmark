@@ -60,7 +60,15 @@ Sizes map to class counts: small=100, medium=500, large=2000.
 
 Each scenario runs 2 warmups + 20 measured iterations. Wall time per scenario ranges from ~2 minutes (synthetic small) to ~20 minutes (dagger large). Total for all 9: ~3–4 hours on an M3 Max.
 
-Run every scenario across all 3 workloads and 3 sizes, writing each scenario's output to its own directory:
+The repository includes a wrapper script that runs every scenario and prints a summary at the end:
+
+```bash
+./scripts/run_all_benchmarks.sh
+```
+
+The script writes each scenario's output to `profile-out/<workload>_<size>/`, then runs the Python summary on each.
+
+If you'd rather drive it yourself, the equivalent loop is:
 
 ```bash
 cd kapt-benchmark
