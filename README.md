@@ -44,6 +44,64 @@ Scenario                              |  N |  Mean (ms) | Stderr |          95% 
 synthetic-noop large (2000 classes)   | 20 |     1180.5 |   26.3 | [1128.9, 1232.1]
 ```
 
+To run the full suite (all 9 scenarios), see [Run all benchmarks](#run-all-benchmarks) below.
+
+## Available scenarios
+
+| Scenario file | Scenario keys |
+|---|---|
+| `scenarios/synthetic.scenarios` | `synthetic_small`, `synthetic_medium`, `synthetic_large` |
+| `scenarios/dagger.scenarios` | `dagger_small`, `dagger_medium`, `dagger_large` |
+| `scenarios/mapstruct.scenarios` | `mapstruct_small`, `mapstruct_medium`, `mapstruct_large` |
+
+Sizes map to class counts: small=100, medium=500, large=2000.
+
+## Run all benchmarks
+
+Each scenario runs 2 warmups + 20 measured iterations. Wall time per scenario ranges from ~2 minutes (synthetic small) to ~20 minutes (dagger large). Total for all 9: ~3–4 hours on an M3 Max.
+
+Run every scenario across all 3 workloads and 3 sizes, writing each scenario's output to its own directory:
+
+```bash
+cd kapt-benchmark
+for w in synthetic dagger mapstruct; do
+    for s in small medium large; do
+        gradle-profiler --benchmark \
+            --output-dir profile-out/${w}_${s} \
+            --scenario-file scenarios/${w}.scenarios \
+            ${w}_${s}
+    done
+done
+
+# Summarize each scenario's output:
+for d in profile-out/*; do
+    echo "=== $d ==="
+    python3 scripts/summarize_benchmark.py "$d/benchmark.csv"
+done
+```
+
+Run just one workload at all 3 sizes:
+
+```bash
+for s in small medium large; do
+    gradle-profiler --benchmark \
+        --output-dir profile-out/synthetic_${s} \
+        --scenario-file scenarios/synthetic.scenarios \
+        synthetic_${s}
+done
+```
+
+Run a single scenario:
+
+```bash
+gradle-profiler --benchmark \
+    --scenario-file scenarios/dagger.scenarios \
+    dagger_medium
+python3 scripts/summarize_benchmark.py profile-out/benchmark.csv
+```
+
+Note: when `--output-dir` is omitted, gradle-profiler writes to `profile-out/` and overwrites prior results, so use distinct directories when running multiple scenarios back-to-back.
+
 ## Workloads
 
 - **`synthetic-noop`** — uses a custom no-op annotation processor (does nothing). The cleanest baseline for "kapt-internal cost only" — `kapt.apt` is essentially zero, so the measurement is dominated by kapt's own stub generation and Kotlin compilation.
