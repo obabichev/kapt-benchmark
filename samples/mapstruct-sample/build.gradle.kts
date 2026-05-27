@@ -48,6 +48,7 @@ val generateSources by tasks.registering(JavaExec::class) {
 sourceSets["main"].kotlin.srcDir(generatedSrcDir)
 
 afterEvaluate {
+    // afterEvaluate: kaptGenerateStubsKotlin is registered lazily by the kapt plugin.
     tasks.named("compileKotlin") { dependsOn(generateSources) }
     tasks.named("kaptGenerateStubsKotlin") { dependsOn(generateSources) }
 }
