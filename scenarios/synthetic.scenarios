@@ -1,0 +1,41 @@
+# synthetic-noop benchmark scenarios — 3 sizes.
+# Output: profile-out/benchmark.csv (gradle-profiler default).
+
+synthetic_small {
+    title = "synthetic-noop small (100 classes)"
+    tasks = [":samples:synthetic-noop:kaptKotlin"]
+    cleanup-tasks = [":samples:synthetic-noop:clean"]
+    gradle-args = [
+        "-PsampleSize=small",
+        "-Pkotlin.compiler.execution.strategy=in-process",
+        "-Dorg.gradle.parallel=false"
+    ]
+    warm-ups = 2
+    iterations = 20
+}
+
+synthetic_medium {
+    title = "synthetic-noop medium (500 classes)"
+    tasks = [":samples:synthetic-noop:kaptKotlin"]
+    cleanup-tasks = [":samples:synthetic-noop:clean"]
+    gradle-args = [
+        "-PsampleSize=medium",
+        "-Pkotlin.compiler.execution.strategy=in-process",
+        "-Dorg.gradle.parallel=false"
+    ]
+    warm-ups = 2
+    iterations = 20
+}
+
+synthetic_large {
+    title = "synthetic-noop large (2000 classes)"
+    tasks = [":samples:synthetic-noop:kaptKotlin"]
+    cleanup-tasks = [":samples:synthetic-noop:clean"]
+    gradle-args = [
+        "-PsampleSize=large",
+        "-Pkotlin.compiler.execution.strategy=in-process",
+        "-Dorg.gradle.parallel=false"
+    ]
+    warm-ups = 2
+    iterations = 20
+}
