@@ -54,14 +54,17 @@ object Generator {
     }
 
     private fun renderMapstructMapper(i: Int): String {
-        // Mappers reference the nearest preceding DATA_CLASS indices (where i % 5 == 0).
-        // For i >= 10, the two preceding data classes are at i-5 and i-10.
-        val src = if (i >= 5) i - 5 else 0
-        val dst = if (i >= 10) i - 10 else 0
+        // Each mapper file also declares a companion _Data class (so Gen${i}_Data always exists),
+        // and the mapper converts from the nearest preceding companion data class to the current one.
+        // Preceding data class is at i-5 (also a mapper file with its own _Data companion).
+        // When i==5, the preceding data class is Gen0_Data (generated as a plain DATA_CLASS shape).
+        val src = i - 5
         return """
+        |data class Gen${i}_Data constructor(val a: Int, val b: String, val c: Long)
+        |
         |@Mapper
         |interface Gen${i}_Mapper {
-        |    fun map(src: Gen${src}_Data): Gen${dst}_Data
+        |    fun map(src: Gen${src}_Data): Gen${i}_Data
         |}
         |""".trimMargin()
     }
