@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-Summarize a gradle-profiler benchmark.csv file.
+Summarize one or more gradle-profiler benchmark.csv files.
 
 Usage:
-    python3 scripts/summarize_benchmark.py path/to/benchmark.csv
+    python3 scripts/summarize_benchmark.py path/to/benchmark.csv [more.csv ...]
 
 Reads gradle-profiler's CSV output (per-iteration task wall times) and prints
-a per-scenario table with N, mean, stderr, and 95% CI.
+a single table with N, mean, stderr, and 95% CI per scenario. When multiple
+CSV files are given, scenarios from all files are merged into one table
+(scenarios with identical titles have their measurements concatenated).
 
 gradle-profiler benchmark.csv shape:
     Row 0: scenario,<title-1>,<title-2>,...
@@ -125,14 +127,33 @@ def render_table(data: Dict[str, List[float]]) -> str:
     return "\n".join(out) + "\n"
 
 
-def main(argv: List[str]) -> int:
-    if len(argv) != 2:
-        print(f"Usage: python3 {argv[0]} path/to/benchmark.csv", file=sys.stderr)
-        return 2
-    csv_path = argv[1]
-    try:
-        with open(csv_path, "r") as f:
+def combine_csv_files(paths: List[str]) -> Dict[str, List[float]]:
+    """Parse multiple benchmark.csv files and merge their scenarios into one dict.
+
+    Scenarios are emitted in input order. If the same scenario title appears in
+    multiple files, the measurements are concatenated.
+    """
+    combined: Dict[str, List[float]] = {}
+    for path in paths:
+        with open(path, "r") as f:
             data = parse_benchmark_csv(f)
+        for title, values in data.items():
+            if title in combined:
+                combined[title].extend(values)
+            else:
+                combined[title] = list(values)
+    return combined
+
+
+def main(argv: List[str]) -> int:
+    if len(argv) < 2:
+        print(
+            f"Usage: python3 {argv[0]} path/to/benchmark.csv [more.csv ...]",
+            file=sys.stderr,
+        )
+        return 2
+    try:
+        data = combine_csv_files(argv[1:])
     except (FileNotFoundError, ValueError) as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1

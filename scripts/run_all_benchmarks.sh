@@ -37,6 +37,7 @@ SIZES=(small medium large)
 echo "Running 9 scenarios (3 workloads × 3 sizes). This will take a few hours."
 echo ""
 
+csv_files=()
 for w in "${WORKLOADS[@]}"; do
     for s in "${SIZES[@]}"; do
         echo "=== Running ${w}_${s} ==="
@@ -44,13 +45,10 @@ for w in "${WORKLOADS[@]}"; do
             --output-dir "profile-out/${w}_${s}" \
             --scenario-file "scenarios/${w}.scenarios" \
             "${w}_${s}"
+        csv_files+=("profile-out/${w}_${s}/benchmark.csv")
     done
 done
 
 echo ""
-echo "=== Summary ==="
-for d in profile-out/*/; do
-    echo ""
-    echo "## $(basename "$d")"
-    python3 scripts/summarize_benchmark.py "${d}benchmark.csv"
-done
+echo "=== Summary (all 9 scenarios) ==="
+python3 scripts/summarize_benchmark.py "${csv_files[@]}"

@@ -88,5 +88,58 @@ class TestRenderTable(unittest.TestCase):
         self.assertIn("95% CI", output)
 
 
+class TestCombineCsvFiles(unittest.TestCase):
+    """When gradle-profiler runs with --output-dir per scenario, each benchmark.csv
+    contains one scenario. combine_csv_files merges those into one dict so a single
+    table can summarize the whole suite.
+    """
+
+    def _write_csv(self, scenario_name: str, measured_values: list) -> str:
+        rows = (
+            f"scenario,{scenario_name}\n"
+            f"version,Gradle 8.14.4\n"
+            f"tasks,:some:task\n"
+            f"value,total execution time\n"
+        )
+        for i, v in enumerate(measured_values, 1):
+            rows += f"measured build #{i},{v}\n"
+        fd, path = tempfile.mkstemp(suffix=".csv")
+        with os.fdopen(fd, "w") as f:
+            f.write(rows)
+        return path
+
+    def test_combines_two_single_scenario_csvs(self):
+        path_a = self._write_csv("scenario-a", [1050.0, 1060.0, 1055.0])
+        path_b = self._write_csv("scenario-b", [2050.0, 2060.0, 2055.0])
+        try:
+            result = sb.combine_csv_files([path_a, path_b])
+            self.assertEqual(set(result.keys()), {"scenario-a", "scenario-b"})
+            self.assertEqual(result["scenario-a"], [1050.0, 1060.0, 1055.0])
+            self.assertEqual(result["scenario-b"], [2050.0, 2060.0, 2055.0])
+        finally:
+            os.unlink(path_a)
+            os.unlink(path_b)
+
+    def test_preserves_input_order(self):
+        path_a = self._write_csv("alpha", [1.0])
+        path_z = self._write_csv("zulu", [2.0])
+        try:
+            result = sb.combine_csv_files([path_z, path_a])
+            self.assertEqual(list(result.keys()), ["zulu", "alpha"])
+        finally:
+            os.unlink(path_a)
+            os.unlink(path_z)
+
+    def test_duplicate_scenario_name_concatenates_values(self):
+        path_1 = self._write_csv("scenario-a", [100.0, 110.0])
+        path_2 = self._write_csv("scenario-a", [200.0, 210.0])
+        try:
+            result = sb.combine_csv_files([path_1, path_2])
+            self.assertEqual(result["scenario-a"], [100.0, 110.0, 200.0, 210.0])
+        finally:
+            os.unlink(path_1)
+            os.unlink(path_2)
+
+
 if __name__ == "__main__":
     unittest.main()

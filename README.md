@@ -60,13 +60,13 @@ Sizes map to class counts: small=100, medium=500, large=2000.
 
 Each scenario runs 2 warmups + 20 measured iterations. Wall time per scenario ranges from ~2 minutes (synthetic small) to ~20 minutes (dagger large). Total for all 9: ~3–4 hours on an M3 Max.
 
-The repository includes a wrapper script that runs every scenario and prints a summary at the end:
+The repository includes a wrapper script that runs every scenario and prints one combined summary table at the end:
 
 ```bash
 ./scripts/run_all_benchmarks.sh
 ```
 
-The script writes each scenario's output to `profile-out/<workload>_<size>/`, then runs the Python summary on each.
+The script writes each scenario's output to `profile-out/<workload>_<size>/`, then summarizes all 9 in a single table.
 
 If you'd rather drive it yourself, the equivalent loop is:
 
@@ -81,11 +81,8 @@ for w in synthetic dagger mapstruct; do
     done
 done
 
-# Summarize each scenario's output:
-for d in profile-out/*; do
-    echo "=== $d ==="
-    python3 scripts/summarize_benchmark.py "$d/benchmark.csv"
-done
+# One combined summary table for all 9 scenarios:
+python3 scripts/summarize_benchmark.py profile-out/*/benchmark.csv
 ```
 
 Run just one workload at all 3 sizes:
