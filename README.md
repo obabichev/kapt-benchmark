@@ -68,6 +68,14 @@ The repository includes a wrapper script that runs every scenario and prints one
 
 The script writes each scenario's output to `profile-out/<workload>_<size>/`, then summarizes all 9 in a single table.
 
+To re-render the combined table from results already on disk (without rerunning anything):
+
+```bash
+./scripts/summarize_all.sh
+```
+
+This reads `profile-out/<workload>_<size>/benchmark.csv` for each scenario it finds and prints one table; scenarios that haven't been run yet are listed but skipped.
+
 If you'd rather drive it yourself, the equivalent loop is:
 
 ```bash
