@@ -2,6 +2,26 @@
 
 A reproducible benchmark for measuring Kotlin annotation processing (kapt) performance on three synthetic workloads. Designed for Kotlin compiler contributors, performance engineers, and anyone evaluating kapt characteristics on a representative codebase.
 
+## TL;DR
+
+```bash
+brew install gradle-profiler          # one-time (macOS); see Prerequisites for Linux/Windows
+./scripts/run_all_benchmarks.sh        # runs all 9 scenarios (~3-4 hours)
+./scripts/summarize_all.sh             # prints one combined results table
+```
+
+Requires JDK 17 and Python 3.7+. See [Quickstart](#quickstart) for prerequisites and [METHODOLOGY.md](METHODOLOGY.md) for what's measured.
+
+Example output:
+
+```
+Scenario                              |  N | Mean (ms) | Stderr |        95% CI (ms)
+synthetic-noop large (2000 classes)   | 20 |    4039.3 |   89.4 | [3864.0, 4214.7]
+dagger-sample large (2000 classes)    | 20 |    7872.5 |  109.2 | [7658.5, 8086.5]
+mapstruct-sample large (2000 classes) | 20 |    6037.9 |  117.5 | [5807.6, 6268.3]
+...
+```
+
 ## What this measures
 
 - **Total `:kaptKotlin` task wall time** per iteration, using gradle-profiler's `--benchmark` mode.
