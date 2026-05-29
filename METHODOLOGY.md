@@ -156,4 +156,4 @@ for d in profile-out/*; do
 done
 ```
 
-Total compute: ~3–4 hours wall on an M3 Max. Each scenario takes ~5–20 minutes depending on workload size and machine speed.
+Total compute: ~30 minutes wall on an M3 Max. Each scenario takes ~1–4 minutes depending on workload size and machine speed.

@@ -6,7 +6,7 @@ A reproducible benchmark for measuring Kotlin annotation processing (kapt) perfo
 
 ```bash
 brew install gradle-profiler          # one-time (macOS); see Prerequisites for Linux/Windows
-./scripts/run_all_benchmarks.sh        # runs all 9 scenarios (~3-4 hours)
+./scripts/run_all_benchmarks.sh        # runs all 9 scenarios (~30 min on M3 Max)
 ./scripts/summarize_all.sh             # prints one combined results table
 ```
 
@@ -78,7 +78,7 @@ Sizes map to class counts: small=100, medium=500, large=2000.
 
 ## Run all benchmarks
 
-Each scenario runs 2 warmups + 20 measured iterations. Wall time per scenario ranges from ~2 minutes (synthetic small) to ~20 minutes (dagger large). Total for all 9: ~3–4 hours on an M3 Max.
+Each scenario runs 2 warmups + 20 measured iterations. Wall time per scenario ranges from ~1 minute (synthetic small) to ~4 minutes (dagger large). Total for all 9: ~30 minutes on an M3 Max.
 
 The repository includes a wrapper script that runs every scenario and prints one combined summary table at the end:
 

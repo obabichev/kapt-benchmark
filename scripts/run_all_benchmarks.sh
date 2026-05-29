@@ -13,7 +13,7 @@
 #   profile-out/<workload>_<size>/benchmark.csv         (one per scenario)
 #   profile-out/<workload>_<size>/benchmark.html        (one per scenario)
 #
-# Total wall time: ~3-4 hours on an M3 Max; size-dependent.
+# Total wall time: ~30 minutes on an M3 Max; size-dependent.
 
 set -euo pipefail
 
@@ -34,7 +34,7 @@ fi
 WORKLOADS=(synthetic dagger mapstruct)
 SIZES=(small medium large)
 
-echo "Running 9 scenarios (3 workloads × 3 sizes). This will take a few hours."
+echo "Running 9 scenarios (3 workloads × 3 sizes). Roughly ~30 minutes on an M3 Max."
 echo ""
 
 csv_files=()
